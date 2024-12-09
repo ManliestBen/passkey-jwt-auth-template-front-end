@@ -1,6 +1,7 @@
 // npm modules
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
 
 // services
 import * as authService from '../../services/authService'
@@ -8,17 +9,14 @@ import * as authService from '../../services/authService'
 // css
 import styles from './Signup.module.css'
 
-const Signup = ({ handleAuthEvt }) => {
-  const navigate = useNavigate()
+const Signup = () => {
+  // const navigate = useNavigate()
 
   const [message, setMessage] = useState('')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    passwordConf: '',
   })
-  const [photoData, setPhotoData] = useState({ photo: null })
   const [isSubmitted, setIsSubmitted] = useState(false)
 
   const handleChange = evt => {
@@ -29,14 +27,18 @@ const Signup = ({ handleAuthEvt }) => {
 
   const handleSubmit = async evt => {
     evt.preventDefault()
+    let asseResp
     try {
       if (!import.meta.env.VITE_BACK_END_SERVER_URL) {
         throw new Error('No VITE_BACK_END_SERVER_URL in front-end .env')
       }
       setIsSubmitted(true)
-      await authService.signup(formData)
-      handleAuthEvt()
-      navigate('/')
+      const opts = await authService.generateRegistrationOptions(formData)
+      console.log(opts)
+      asseResp = await startRegistration({ optionsJSON: opts })
+      console.log(asseResp)
+      // handleAuthEvt()
+      // navigate('/')
     } catch (err) {
       console.log(err)
       setMessage(err.message)
@@ -44,10 +46,10 @@ const Signup = ({ handleAuthEvt }) => {
     }
   }
 
-  const { name, email, password, passwordConf } = formData
+  const { name, email } = formData
 
   const isFormInvalid = () => {
-    return !(name && email && password && password === passwordConf)
+    return !(name && email)
   }
 
   return (
@@ -57,7 +59,7 @@ const Signup = ({ handleAuthEvt }) => {
       <form autoComplete="off" onSubmit={handleSubmit} className={styles.form}>
         <label className={styles.label}>
           Name
-          <input type="text" value={name} name="name" onChange={handleChange} />
+          <input type="text" value={name} name="name" onChange={handleChange} autoComplete='name webauthn'/>
         </label>
         <label className={styles.label}>
           Email
@@ -65,28 +67,12 @@ const Signup = ({ handleAuthEvt }) => {
             type="text"
             value={email}
             name="email"
+            autoComplete='email webauthn'
             onChange={handleChange}
           />
         </label>
-        <label className={styles.label}>
-          Password
-          <input
-            type="password"
-            value={password}
-            name="password"
-            onChange={handleChange}
-          />
-        </label>
-        <label className={styles.label}>
-          Confirm Password
-          <input
-            type="password"
-            value={passwordConf}
-            name="passwordConf"
-            onChange={handleChange}
-          />
-        </label>
-                <div>
+        
+        <div>
           <Link to="/">Cancel</Link>
           <button
             className={styles.button}

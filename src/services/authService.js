@@ -22,6 +22,20 @@ async function signup(signupFormData) {
   }
 }
 
+async function generateRegistrationOptions(registrationFormData) {
+  try {
+    const res = await fetch(`${BASE_URL}/generate-registration-options`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(registrationFormData),
+    })
+
+    return res.json()
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
 function getUser() {
   return tokenService.getUserFromToken()
 }
@@ -70,4 +84,4 @@ async function changePassword(changePasswordFormData) {
   }
 }
 
-export { signup, getUser, logout, login, changePassword }
+export { signup, getUser, logout, login, changePassword, generateRegistrationOptions }
