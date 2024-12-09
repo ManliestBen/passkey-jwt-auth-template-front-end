@@ -1,10 +1,9 @@
 // services
 import * as tokenService from './tokenService'
-import { addPhoto as addProfilePhoto } from './profileService'
 
 const BASE_URL = `${import.meta.env.VITE_BACK_END_SERVER_URL}/api/auth`
 
-async function signup(signupFormData, photoData) {
+async function signup(signupFormData) {
   try {
     const res = await fetch(`${BASE_URL}/signup`, {
       method: 'POST',
@@ -17,10 +16,6 @@ async function signup(signupFormData, photoData) {
 
     if (json.token) {
       tokenService.setToken(json.token)
-
-      if (photoData) {
-        await addProfilePhoto(photoData)
-      }
     }
   } catch (err) {
     throw new Error(err)
