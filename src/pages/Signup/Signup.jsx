@@ -27,7 +27,7 @@ const Signup = () => {
 
   const handleSubmit = async evt => {
     evt.preventDefault()
-    let asseResp
+    let attestationResponse
     try {
       if (!import.meta.env.VITE_BACK_END_SERVER_URL) {
         throw new Error('No VITE_BACK_END_SERVER_URL in front-end .env')
@@ -35,8 +35,11 @@ const Signup = () => {
       setIsSubmitted(true)
       const opts = await authService.generateRegistrationOptions(formData)
       console.log(opts)
-      asseResp = await startRegistration({ optionsJSON: opts })
-      console.log(asseResp)
+      attestationResponse = await startRegistration({ optionsJSON: opts })
+      console.log(attestationResponse)
+      attestationResponse.webAuthId = opts.user.id
+      const verificationResponse = await authService.verifyRegistration(attestationResponse)
+      console.log(verificationResponse)
       // handleAuthEvt()
       // navigate('/')
     } catch (err) {
