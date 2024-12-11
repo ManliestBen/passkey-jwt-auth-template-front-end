@@ -43,8 +43,12 @@ async function verifyRegistration(attestationData) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(attestationData),
     })
+    const json = await res.json()
+    if (json.err) throw new Error(json.err)
+    if (json.token) {
+      tokenService.setToken(json.token)
+    }
 
-    return res.json()
   } catch (err) {
     throw new Error(err)
   }

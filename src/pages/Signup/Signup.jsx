@@ -9,8 +9,8 @@ import * as authService from '../../services/authService'
 // css
 import styles from './Signup.module.css'
 
-const Signup = () => {
-  // const navigate = useNavigate()
+const Signup = ({ handleAuthEvt }) => {
+  const navigate = useNavigate()
 
   const [message, setMessage] = useState('')
   const [formData, setFormData] = useState({
@@ -40,8 +40,8 @@ const Signup = () => {
       attestationResponse.webAuthId = opts.user.id
       const verificationResponse = await authService.verifyRegistration(attestationResponse)
       console.log(verificationResponse)
-      // handleAuthEvt()
-      // navigate('/')
+      handleAuthEvt()
+      navigate('/')
     } catch (err) {
       console.log(err)
       setMessage(err.message)
