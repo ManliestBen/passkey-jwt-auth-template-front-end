@@ -1,7 +1,7 @@
 // npm modules
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { startAuthentication, startRegistration } from '@simplewebauthn/browser'
+import { startRegistration } from '@simplewebauthn/browser'
 
 // services
 import * as authService from '../../services/authService'

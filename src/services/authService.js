@@ -54,6 +54,38 @@ async function verifyRegistration(attestationData) {
   }
 }
 
+async function generateAuthenticationOptions(authenticationFormData) {
+  try {
+    const res = await fetch(`${BASE_URL}/generate-authentication-options`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(authenticationFormData),
+    })
+
+    return res.json()
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
+async function verifyAuthentication(attestationData) {
+  try {
+    const res = await fetch(`${BASE_URL}/verify-authentication`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(attestationData),
+    })
+    const json = await res.json()
+    if (json.err) throw new Error(json.err)
+    if (json.token) {
+      tokenService.setToken(json.token)
+    }
+
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
 function getUser() {
   return tokenService.getUserFromToken()
 }
@@ -102,4 +134,4 @@ async function changePassword(changePasswordFormData) {
   }
 }
 
-export { signup, getUser, logout, login, changePassword, generateRegistrationOptions, verifyRegistration }
+export { signup, getUser, logout, login, changePassword, generateRegistrationOptions, verifyRegistration, generateAuthenticationOptions, verifyAuthentication }

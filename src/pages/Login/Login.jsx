@@ -1,6 +1,7 @@
 // npm modules
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { startAuthentication } from '@simplewebauthn/browser'
 
 // services
 import * as authService from '../../services/authService'
@@ -13,8 +14,7 @@ const LoginPage = ({ handleAuthEvt }) => {
 
   const [message, setMessage] = useState('')
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: ''
   })
 
   const handleChange = evt => {
@@ -24,11 +24,19 @@ const LoginPage = ({ handleAuthEvt }) => {
 
   const handleSubmit = async evt => {
     evt.preventDefault()
+    let attestationResponse
     try {
       if (!import.meta.env.VITE_BACK_END_SERVER_URL) {
         throw new Error('No VITE_BACK_END_SERVER_URL in front-end .env')
       }
-      await authService.login(formData)
+      const opts = await authService.generateAuthenticationOptions(formData)
+      console.log(opts)
+      attestationResponse = await startAuthentication({ optionsJSON: opts })
+      attestationResponse.email = formData.email
+      const verificationResponse = await authService.verifyAuthentication(attestationResponse)
+      console.log(verificationResponse)
+
+      // await authService.login(formData)
       handleAuthEvt()
       navigate('/')
     } catch (err) {
@@ -37,10 +45,10 @@ const LoginPage = ({ handleAuthEvt }) => {
     }
   }
 
-  const { email, password } = formData
+  const { email } = formData
 
   const isFormInvalid = () => {
-    return !(email && password)
+    return !(email)
   }
 
   return (
@@ -54,15 +62,6 @@ const LoginPage = ({ handleAuthEvt }) => {
             type="text"
             value={email}
             name="email"
-            onChange={handleChange}
-          />
-        </label>
-        <label className={styles.label}>
-          Password
-          <input
-            type="password"
-            value={password}
-            name="password"
             onChange={handleChange}
           />
         </label>
